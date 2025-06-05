@@ -118,11 +118,8 @@ If an unknown format is used, the script will attempt to upload it with a generi
 
 ## 📌 Roadmap
 
-- [ ] Support transcription from Supabase Storage URLs
-- [ ] Source-type-based handling (`local` vs `supabase`)
 - [ ] Save transcription results to `.txt` or `.json`
 - [ ] Build a CLI interface using `commander`
-- [ ] Add support for more audio formats
 
 ## 📄 License
 
