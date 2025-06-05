@@ -14,3 +14,13 @@ export interface TranscriptionConfig {
 	style?: TranscriptionStyle;
 	language?: string | null;
 }
+
+
+export type KnownAudioExtension =
+	| ".mp3"
+	| ".wav"
+	| ".aac"
+	| ".flac"
+	| ".ogg"
+	| ".webm"
+	| ".weba";
