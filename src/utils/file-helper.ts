@@ -27,9 +27,9 @@ const mimeTypes: Record<KnownAudioExtension, string> = {
 	".ogg": "audio/ogg",
 	".webm": "audio/webm",
 	".weba": "audio/webm",
-};
+} as const;
 
-export async function getMimeType(filePath: string): Promise<string> {
+export function getMimeType(filePath: string): string {
 	const ext = path.extname(filePath).toLowerCase();
 
 	if (Object.hasOwn(mimeTypes, ext)) {
