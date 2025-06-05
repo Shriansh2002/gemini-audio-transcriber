@@ -30,11 +30,9 @@ const mimeTypes: Record<KnownAudioExtension, string> = {
 };
 
 export async function getMimeType(filePath: string): Promise<string> {
-	const ext = path.extname(filePath).toLowerCase() as
-		| KnownAudioExtension
-		| string;
+	const ext = path.extname(filePath).toLowerCase();
 
-	if (ext in mimeTypes) {
+	if (Object.hasOwn(mimeTypes, ext)) {
 		return mimeTypes[ext as KnownAudioExtension];
 	} else {
 		console.warn(
