@@ -9,18 +9,20 @@ export async function runTranscription(config: TranscriptionConfig) {
 
 	try {
 		const isRemote = audioFile.startsWith("http");
+		let filePath = audioFile;
 
 		if (!isRemote) {
 			const resolvedPath = path.resolve(audioFile);
 			await fs.access(resolvedPath);
 			console.log(chalk.blueBright(`[info] Processing audio: ${resolvedPath}`));
+			filePath = resolvedPath;
 		} else {
 			console.log(
 				chalk.blueBright(`[info] Fetching remote audio: ${audioFile}`)
 			);
 		}
 
-		const transcription = await transcribeAudio(audioFile, {
+		const transcription = await transcribeAudio(filePath, {
 			style,
 			language,
 			sourceType: isRemote ? "supabase" : "local",
