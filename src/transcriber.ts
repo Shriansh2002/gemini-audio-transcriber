@@ -4,14 +4,9 @@ import * as path from "node:path";
 import { CustomFile, getMimeType } from "./utils/file-helper";
 import dotenv from "dotenv";
 import { TRANSCRIPTION_PROMPTS, type TranscriptionStyle } from "./utils/prompt";
+import { TranscribeAudioOptions, TranscriptionSources } from "./types";
 
 dotenv.config();
-
-interface TranscribeAudioOptions {
-	style?: TranscriptionStyle; // Use the defined TranscriptionStyle type
-	language?: string | null;
-	context?: string | null;
-}
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
@@ -25,9 +20,29 @@ export async function transcribeAudio(
 ): Promise<string | null> {
 	try {
 		// Destructure with default values and types
-		const { style = "accurate", language = null, context = null } = options;
+		const {
+			style = "accurate",
+			language = null,
+			context = null,
+			sourceType = "local",
+		} = options;
 
-		const buffer: Buffer = await fs.readFile(filePath);
+		let buffer: Buffer;
+
+		if (sourceType === "supabase") {
+			const response = await fetch(filePath);
+			if (!response.ok) {
+				console.error(
+					`[error] Failed to fetch remote file: ${response.statusText}`
+				);
+				return null;
+			}
+			const arrayBuffer = await response.arrayBuffer();
+			buffer = Buffer.from(arrayBuffer);
+		} else {
+			buffer = await fs.readFile(filePath);
+		}
+
 		const mimeType: string = await getMimeType(filePath);
 		const fileName: string = path.basename(filePath);
 
