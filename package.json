@@ -1,0 +1,26 @@
+{
+	"name": "audio-transcripter",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"start": "node dist/index.js",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "tsc --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"type": "commonjs",
+	"devDependencies": {
+		"@types/node": "^22.15.29",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"@google/genai": "^1.4.0",
+		"chalk": "^5.4.1",
+		"dotenv": "^16.5.0"
+	}
+}
