@@ -1,5 +1,5 @@
 {
-	"name": "audio-transcripter",
+	"name": "audio-transcriber",
 	"version": "1.0.0",
 	"description": "A Node.js package for audio transcription using Gemini AI technology.",
 	"main": "dist/index.js",
