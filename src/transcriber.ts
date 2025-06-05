@@ -4,16 +4,9 @@ import * as path from "node:path";
 import { CustomFile, getMimeType } from "./utils/file-helper";
 import dotenv from "dotenv";
 import { TRANSCRIPTION_PROMPTS, type TranscriptionStyle } from "./utils/prompt";
-import { TranscriptionSources } from "./types";
+import { TranscribeAudioOptions, TranscriptionSources } from "./types";
 
 dotenv.config();
-
-interface TranscribeAudioOptions {
-	style?: TranscriptionStyle; // Use the defined TranscriptionStyle type
-	language?: string | null;
-	context?: string | null;
-	sourceType?: TranscriptionSources;
-}
 
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
