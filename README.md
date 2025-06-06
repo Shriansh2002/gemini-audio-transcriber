@@ -52,11 +52,19 @@ npm install
 
 ### 3. Setup Environment Variables
 
-Create a `.env` file in the root and add your Gemini API key:
+You can set up your Gemini API key in one of two ways:
 
-```
-GEMINI_API_KEY=your-gemini-api-key-here
-```
+1. **Environment Variable** (Recommended for production):
+
+   ```bash
+   export TRANSCRIBER_KEY=your-gemini-api-key-here
+   ```
+
+2. **.env File** (Recommended for development):
+   Create a `.env` file in your project root:
+   ```
+   TRANSCRIBER_KEY=your-gemini-api-key-here
+   ```
 
 > Get your API key from [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
 
