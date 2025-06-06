@@ -52,7 +52,7 @@ export async function transcribeAudio(
 			buffer = await fs.readFile(filePath);
 		}
 
-		const mimeType: string = await getMimeType(filePath);
+		const mimeType: string = getMimeType(filePath);
 		const fileName: string = path.basename(filePath);
 
 		const file = new CustomFile([buffer], fileName, { type: mimeType });
