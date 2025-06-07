@@ -3,15 +3,24 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { CustomFile, getMimeType } from "./utils/file-helper";
 import dotenv from "dotenv";
-import { TRANSCRIPTION_PROMPTS, type TranscriptionStyle } from "./utils/prompt";
-import { TranscribeAudioOptions, TranscriptionSources } from "./types";
+import { TRANSCRIPTION_PROMPTS } from "./utils/prompt";
+import { TranscribeAudioOptions } from "./types";
 
+// Try to load .env file from current working directory
 dotenv.config();
 
-const API_KEY = process.env.GEMINI_API_KEY;
+// Get API key from environment variables or .env file
+const API_KEY = process.env.TRANSCRIBER_KEY;
+
 if (!API_KEY) {
-	throw new Error("GEMINI_API_KEY is missing. Check your .env file.");
+	throw new Error(
+		"TRANSCRIBER_KEY is missing. Please set it in one of the following ways:\n" +
+			"1. Set it as an environment variable: export TRANSCRIBER_KEY=your-key-here\n" +
+			"2. Create a .env file in your project root with: TRANSCRIBER_KEY=your-key-here\n\n" +
+			"Get your API key from: https://makersuite.google.com/app/apikey"
+	);
 }
+
 const genAI = new GoogleGenAI({ apiKey: API_KEY });
 
 export async function transcribeAudio(
@@ -43,7 +52,7 @@ export async function transcribeAudio(
 			buffer = await fs.readFile(filePath);
 		}
 
-		const mimeType: string = await getMimeType(filePath);
+		const mimeType: string = getMimeType(filePath);
 		const fileName: string = path.basename(filePath);
 
 		const file = new CustomFile([buffer], fileName, { type: mimeType });
