@@ -3,7 +3,7 @@ import http from "node:http";
 
 export function checkUrlExists(
 	url: string,
-	options?: { timeout?: number }
+	options?: { timeout?: number; verbose?: boolean }
 ): Promise<{ exists: boolean; status?: number }> {
 	return new Promise((resolve) => {
 		const client = url.startsWith("https") ? https : http;
@@ -17,7 +17,12 @@ export function checkUrlExists(
 			resolve({ exists, status: res.statusCode });
 		});
 
-		req.on("error", () => resolve({ exists: false }));
+		req.on("error", (err) => {
+			if (options?.verbose) {
+				console.error("Error in checkUrlExists:", err.message);
+			}
+			resolve({ exists: false });
+		});
 
 		req.setTimeout(timeoutMs, () => {
 			req.destroy();
