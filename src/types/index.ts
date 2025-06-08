@@ -14,6 +14,7 @@ export interface TranscriptionConfig {
 	style?: TranscriptionStyle;
 	language?: string | null;
 	verbose?: boolean;
+	timeout?: number;
 }
 
 export type KnownAudioExtension =

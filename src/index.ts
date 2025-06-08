@@ -13,6 +13,7 @@ export async function runTranscription(
 		style = "conversational",
 		language = "english",
 		verbose = true,
+		timeout = 5000,
 	} = config;
 
 	// Validate audioFile early
@@ -24,12 +25,12 @@ export async function runTranscription(
 	}
 
 	try {
-		const isRemote: boolean = /^https?:\/\//i.test(audioFile);
+		const isRemote = /^https?:\/\//i.test(audioFile);
 
 		let filePath: string = audioFile;
 
 		if (!isRemote) {
-			const resolvedPath: string = path.resolve(audioFile);
+			const resolvedPath = path.resolve(audioFile);
 			await fs.access(resolvedPath);
 			if (verbose) {
 				console.log(
@@ -44,10 +45,9 @@ export async function runTranscription(
 				);
 			}
 
-			const checkResult: { exists: boolean; status?: number } =
-				await checkUrlExists(audioFile, {
-					timeout: 5000,
-				});
+			const checkResult = await checkUrlExists(audioFile, {
+				timeout,
+			});
 
 			if (!checkResult.exists) {
 				const statusText =
