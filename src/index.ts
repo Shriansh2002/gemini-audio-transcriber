@@ -15,13 +15,21 @@ export async function runTranscription(
 		verbose = true,
 	} = config;
 
-	try {
-		const isRemote = /^https?:\/\//i.test(audioFile);
+	// Validate audioFile early
+	if (typeof audioFile !== "string" || audioFile.trim() === "") {
+		return {
+			success: false,
+			error: "Invalid audioFile parameter: must be a non-empty string",
+		};
+	}
 
-		let filePath = audioFile;
+	try {
+		const isRemote: boolean = /^https?:\/\//i.test(audioFile);
+
+		let filePath: string = audioFile;
 
 		if (!isRemote) {
-			const resolvedPath = path.resolve(audioFile);
+			const resolvedPath: string = path.resolve(audioFile);
 			await fs.access(resolvedPath);
 			if (verbose) {
 				console.log(
@@ -36,21 +44,17 @@ export async function runTranscription(
 				);
 			}
 
-			const { exists, status } = await checkUrlExists(audioFile, {
-				timeout: 5000,
-			});
-			if (!exists) {
-				console.error(
-					chalk.red(
-						`[error] Remote URL not reachable (status: ${
-							status ?? "unknown"
-						}): ${audioFile}`
-					)
-				);
-				return {
-					success: false,
-					error: `Remote URL not reachable (status: ${status ?? "unknown"})`,
-				};
+			const checkResult: { exists: boolean; status?: number } =
+				await checkUrlExists(audioFile, {
+					timeout: 5000,
+				});
+
+			if (!checkResult.exists) {
+				const statusText =
+					checkResult.status !== undefined ? checkResult.status : "unknown";
+				const errorMsg = `[error] Remote URL not reachable (status: ${statusText}): ${audioFile}`;
+				console.error(chalk.red(errorMsg));
+				return { success: false, error: errorMsg };
 			}
 		}
 
@@ -58,7 +62,7 @@ export async function runTranscription(
 			console.time("TranscriptionTime");
 		}
 
-		const transcription = await transcribeAudio(filePath, {
+		const transcription: string | null = await transcribeAudio(filePath, {
 			style,
 			language,
 			sourceType: isRemote ? "supabase" : "local",
@@ -76,24 +80,27 @@ export async function runTranscription(
 			}
 			return { success: true, transcription };
 		} else {
-			console.log(chalk.yellow("[warn] No transcription result returned."));
+			const warningMsg = "[warn] No transcription result returned.";
+			if (verbose) {
+				console.log(chalk.yellow(warningMsg));
+			}
 			return { success: false, error: "No transcription result returned." };
 		}
 	} catch (err: unknown) {
-		if ((err as NodeJS.ErrnoException).code === "ENOENT") {
-			console.error(chalk.red(`[error] File not found: ${audioFile}`));
-			return { success: false, error: `File not found: ${audioFile}` };
+		if (
+			typeof err === "object" &&
+			err !== null &&
+			"code" in err &&
+			(err as NodeJS.ErrnoException).code === "ENOENT"
+		) {
+			const errorMsg = `[error] File not found: ${audioFile}`;
+			console.error(chalk.red(errorMsg));
+			return { success: false, error: errorMsg };
 		} else {
-			console.error(
-				chalk.red("[error] Unexpected error:"),
-				err instanceof Error ? err.message : String(err)
-			);
-			return {
-				success: false,
-				error: `Unexpected error: ${
-					err instanceof Error ? err.message : String(err)
-				}`,
-			};
+			const errorMessage =
+				err instanceof Error ? err.message : String(err ?? "Unknown error");
+			console.error(chalk.red("[error] Unexpected error:"), errorMessage);
+			return { success: false, error: `Unexpected error: ${errorMessage}` };
 		}
 	}
 }
