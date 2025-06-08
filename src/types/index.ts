@@ -13,8 +13,9 @@ export interface TranscriptionConfig {
 	audioFile: string;
 	style?: TranscriptionStyle;
 	language?: string | null;
+	verbose?: boolean;
+	timeout?: number;
 }
-
 
 export type KnownAudioExtension =
 	| ".mp3"
@@ -24,3 +25,9 @@ export type KnownAudioExtension =
 	| ".ogg"
 	| ".webm"
 	| ".weba";
+
+export type RunTranscriptionResult = {
+	success: boolean;
+	transcription?: string;
+	error?: string;
+};
