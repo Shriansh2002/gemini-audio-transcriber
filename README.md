@@ -1,134 +1,239 @@
-# 🎙️ Gemini Audio Transcriber
+# 🎙️ audio-transcripter
 
-A TypeScript utility that transcribes local audio files (e.g., `.webm`, `.mp3`, `.wav`) using **Google Gemini 1.5 Flash** via the `@google/genai` SDK.
+A lightweight TypeScript library for transcribing audio files using **Google Gemini 2.0** models.
 
-Powered by Google's Gemini API, this script reads an audio file, uploads it, and returns the transcription with minimal setup.
-
----
-
-## ✨ Features
-
-- ✅ Supports common audio formats: `.webm`, `.mp3`, `.wav`, `.ogg`, `.flac`, `.aac`
-- ⚡ Uses **Gemini 1.5 Flash** for fast transcription
-- 🗃️ Fully local: no cloud storage or uploads beyond Gemini file API
-- 🌱 TypeScript implementation with full type safety
-- 🛠️ Modular and maintainable code structure
+Supports local files, remote URLs, and in-memory buffers/blobs.
+**Ideal for meetings, interviews, podcasts, technical content, and more.**
 
 ---
 
-## 📂 Project Structure
-
-```
-├── src/               # Source code
-│   ├── index.ts      # Main entry point
-│   ├── transcriber.ts # Core transcription logic
-│   └── utils/        # Utility functions
-│       ├── file-helper.ts
-│       └── prompt.ts
-├── assets/           # Audio files directory
-├── dist/            # Compiled JavaScript output
-├── .env             # Environment variables
-├── tsconfig.json    # TypeScript configuration
-├── package.json     # Project dependencies
-└── README.md        # This file
-```
-
----
-
-## 🚀 Getting Started
-
-### 1. Clone the Repository
+## 🚀 Installation
 
 ```bash
-git clone https://github.com/shriansh2002/gemini-audio-transcriber.git
-cd gemini-audio-transcriber
+npm install audio-transcripter
 ```
-
-### 2. Install Dependencies
-
-```bash
-npm install
-```
-
-### 3. Setup Environment Variables
-
-You can set up your Gemini API key in one of two ways:
-
-1. **Environment Variable** (Recommended for production):
-
-   ```bash
-   export TRANSCRIBER_KEY=your-gemini-api-key-here
-   ```
-
-2. **.env File** (Recommended for development):
-   Create a `.env` file in your project root:
-   ```
-   TRANSCRIBER_KEY=your-gemini-api-key-here
-   ```
-
-> Get your API key from [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
-
-### 4. Add an Audio File
-
-Place your audio file (e.g., `audio.webm`) inside the `assets/` folder.
 
 ---
 
-## 🧠 Usage
+## 🌟 Features
 
-### Development
+* 🎧 Supports local files (`.wav`, `.mp3`, `.aac`, `.flac`, `.ogg`, `.webm`, etc.)
+* 🌐 Supports remote URLs (HTTP/HTTPS)
+* 📦 Supports Blobs / Buffers
+* ✨ Multiple transcription styles:
 
-Run the TypeScript code directly using ts-node:
-
-```bash
-npx ts-node src/index.ts
-```
-
-### Production
-
-Build and run the compiled JavaScript:
-
-```bash
-npm run build
-node dist/index.js
-```
-
-The script will:
-
-- Upload the audio to Gemini's File API
-- Generate a transcription using `gemini-2.0-flash`
-- Print the result to the console
+  * `accurate`
+  * `clean`
+  * `structured`
+  * `technical`
+  * `conversational`
+* 🔍 Verbose logging (optional)
+* ⚙️ Written in TypeScript with full type safety
 
 ---
 
-## 🧩 Supported File Formats
+## 🧑‍💻 Usage
 
-- `.mp3`
-- `.wav`
-- `.aac`
-- `.flac`
-- `.ogg`
-- `.webm` / `.weba`
+### 1️⃣ Transcribe Local File
 
-If an unknown format is used, the script will attempt to upload it with a generic MIME type (`audio/octet-stream`).
+```ts
+import { runTranscription } from "audio-transcripter";
+
+const result = await runTranscription({
+  audioFile: "./assets/audio.webm",
+  style: "structured", // optional, default: 'conversational'
+  language: "english", // optional
+});
+
+if (result.success) {
+  console.log("Transcription:", result.transcription);
+} else {
+  console.error("Error:", result.error);
+}
+```
+
+---
+
+### 2️⃣ Transcribe Remote URL
+
+```ts
+const result = await runTranscription({
+  audioFile: "https://example.com/audio.mp3",
+  style: "clean",
+  language: "english",
+});
+```
+
+---
+
+### 3️⃣ Transcribe Blob / Buffer (for browser or Node.js)
+
+```ts
+import { runTranscriptionWithBlob } from "audio-transcripter";
+
+// Example with a Node.js Buffer
+const fs = await import("fs/promises");
+const audioBuffer = await fs.readFile("./assets/audio.wav");
+
+const result = await runTranscriptionWithBlob(audioBuffer, {
+  style: "technical",
+  language: "english",
+});
+
+if (result.success) {
+  console.log("Transcription:", result.transcription);
+} else {
+  console.error("Error:", result.error);
+}
+```
+
+---
+
+## 📥 Configuration Options
+
+| Option      | Type    | Default            | Description                                       |
+| ----------- | ------- | ------------------ | ------------------------------------------------- |
+| `audioFile` | string  | *required*         | Local file path or remote URL                     |
+| `style`     | string  | `'conversational'` | Transcription style (see below)                   |
+| `language`  | string  | `'english'`        | Language of the audio                             |
+| `verbose`   | boolean | `true`             | Enable verbose console logs                       |
+| `timeout`   | number  | `5000` (ms)        | Timeout for remote URL HEAD check (if applicable) |
+
+---
+
+## 🎨 Supported Transcription Styles
+
+| Style            | Description                                                  |
+| ---------------- | ------------------------------------------------------------ |
+| `accurate`       | High accuracy, raw transcription including filler words      |
+| `clean`          | Edited for readability (filler words removed, grammar fixed) |
+| `structured`     | Meeting/interview format with speakers and structure         |
+| `technical`      | Technical content with jargon preserved                      |
+| `conversational` | Casual, creative, natural conversation transcription         |
+
+---
+
+## 🗂️ Supported File Formats
+
+* `.mp3`
+* `.wav`
+* `.aac`
+* `.flac`
+* `.ogg`
+* `.webm` / `.weba`
+
+> Unknown formats fallback to `audio/octet-stream`.
+
+---
+
+## 📚 API Reference
+
+### `runTranscription(config: TranscriptionConfig)`
+
+Runs transcription on local file path or remote URL.
+
+Returns: `Promise<RunTranscriptionResult>`
+
+```ts
+type RunTranscriptionResult = {
+  success: boolean;
+  transcription?: string;
+  error?: string;
+};
+```
+
+---
+
+### `runTranscriptionWithBlob(audioBlob: Blob | Buffer, options?)`
+
+Runs transcription on an in-memory Blob or Node.js Buffer.
+
+Returns: `Promise<RunTranscriptionResult>`
+
+---
+
+## 🗂️ Type Definitions
+
+```ts
+export type TranscriptionStyle =
+  | "accurate"
+  | "clean"
+  | "structured"
+  | "technical"
+  | "conversational";
+
+export interface TranscriptionConfig {
+  audioFile: string;
+  style?: TranscriptionStyle;
+  language?: string | null;
+  verbose?: boolean;
+  timeout?: number;
+}
+
+export interface RunTranscriptionResult {
+  success: boolean;
+  transcription?: string;
+  error?: string;
+}
+```
+
+---
+
+## 🔐 Authentication
+
+This package requires a **Gemini API Key**.
+
+1️⃣ Set `TRANSCRIBER_KEY` in your environment:
+
+```bash
+export TRANSCRIBER_KEY=your-gemini-api-key-here
+```
+
+or
+
+2️⃣ Create a `.env` file:
+
+```dotenv
+TRANSCRIBER_KEY=your-gemini-api-key-here
+```
+
+Get your API key from [Google MakerSuite](https://makersuite.google.com/app/apikey).
 
 ---
 
 ## 🛠️ Tech Stack
 
-- [TypeScript](https://www.typescriptlang.org/)
-- [Node.js](https://nodejs.org/)
-- [@google/genai](https://www.npmjs.com/package/@google/genai)
-- [dotenv](https://www.npmjs.com/package/dotenv) for environment variables
-- ES Modules + Native Blob + File polyfill for Node
+* [TypeScript](https://www.typescriptlang.org/)
+* [Node.js](https://nodejs.org/)
+* [@google/genai](https://www.npmjs.com/package/@google/genai)
+* [dotenv](https://www.npmjs.com/package/dotenv)
 
 ---
 
-## 📌 Roadmap
-
-- [ ] Save transcription results to `.txt` or `.json`
-- [ ] Build a CLI interface using `commander`
-
 ## 📄 License
 
-MIT License © 2024 Shriansh Agarwal
+MIT License © 2025 Shriansh Agarwal
+
+---
+
+## 🙋 FAQ
+
+**Q:** Does this upload my file to third-party storage?
+**A:** No. Files are uploaded only to Gemini's File API endpoint.
+
+**Q:** Can I use this in the browser?
+**A:** `runTranscriptionWithBlob` works with browser Blob and Node.js Buffer.
+
+**Q:** What models are used?
+**A:** `gemini-2.0-flash` model via Google GenAI SDK.
+
+---
+
+# Summary
+
+👉 Lightweight
+👉 Flexible API
+👉 Multiple styles
+👉 Works with files, URLs, Blobs
+
+---

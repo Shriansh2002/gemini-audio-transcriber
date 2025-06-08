@@ -1,7 +1,7 @@
 {
 	"name": "audio-transcripter",
-	"version": "1.0.2",
-	"description": "A Node.js package for audio transcription using Gemini AI technology.",
+	"version": "2.0.0",
+	"description": "Lightweight TypeScript library for transcribing audio files using Google Gemini 2.0 models. Supports local files, remote URLs, and Blobs.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
@@ -12,14 +12,18 @@
 		"prepublishOnly": "npm run build"
 	},
 	"keywords": [
-		"audio",
-		"transcription",
 		"gemini",
-		"speech-to-text",
-		"nodejs",
-		"typescript"
+		"audio",
+		"transcriber",
+		"transcription",
+		"google-genai",
+		"typescript",
+		"blob",
+		"url",
+		"buffer",
+		"speech-to-text"
 	],
-	"author": "Shriansh2002",
+	"author": "Shriansh Agarwal",
 	"license": "MIT",
 	"repository": {
 		"type": "git",
