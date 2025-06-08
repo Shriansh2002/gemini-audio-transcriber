@@ -5,6 +5,34 @@ import { transcribeAudio } from "./transcriber";
 import { checkUrlExists } from "./utils/checkUrlExists";
 import type { TranscriptionConfig, RunTranscriptionResult } from "./types";
 
+/**
+ * Transcribe audio from a local file path or a remote URL.
+ *
+ * @param {TranscriptionConfig} config - Configuration options for transcription.
+ * @param {string} config.audioFile - Path to a local audio file or URL of a remote audio file.
+ * @param {string} [config.style='conversational'] - Transcription style, e.g., 'conversational' or 'formal'.
+ * @param {string} [config.language='english'] - Language code or name of the audio language.
+ * @param {boolean} [config.verbose=true] - Enable verbose logging of processing steps and errors.
+ * @param {number} [config.timeout=5000] - Timeout in milliseconds for checking remote URL availability.
+ *
+ * @returns {Promise<RunTranscriptionResult>} A promise that resolves to a structured transcription result
+ *          including success status, transcription text (if successful), or error message.
+ *
+ * @throws Will not throw errors but return structured error results on failures such as:
+ *         - Invalid or missing audio file path/URL
+ *         - Local file not found or inaccessible
+ *         - Remote URL unreachable or timing out
+ *         - Unexpected errors during transcription process
+ *
+ * @example
+ * const result = await runTranscription({ audioFile: "./audio.wav" });
+ * if (result.success) {
+ *   console.log("Transcription:", result.transcription);
+ * } else {
+ *   console.error("Error:", result.error);
+ * }
+ */
+
 export async function runTranscription(
 	config: TranscriptionConfig
 ): Promise<RunTranscriptionResult> {
