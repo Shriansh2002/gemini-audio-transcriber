@@ -1,6 +1,6 @@
 import { TranscriptionStyle } from "../utils/prompt";
 
-export type TranscriptionSources = "local" | "supabase";
+export type TranscriptionSources = "local" | "remote";
 
 export interface TranscribeAudioOptions {
 	style?: TranscriptionStyle;
