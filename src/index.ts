@@ -2,13 +2,16 @@ import * as fs from "node:fs/promises";
 import path from "node:path";
 import chalk from "chalk";
 import { transcribeAudio } from "./transcriber";
+import { checkUrlExists } from "./utils/checkUrlExists";
 import type { TranscriptionConfig } from "./types";
 
 export async function runTranscription(config: TranscriptionConfig) {
 	const { audioFile, style = "conversational", language = "english" } = config;
 
 	try {
-		const isRemote = audioFile.startsWith("http");
+		const isRemote =
+			audioFile.startsWith("http://") || audioFile.startsWith("https://");
+
 		let filePath = audioFile;
 
 		if (!isRemote) {
@@ -20,6 +23,14 @@ export async function runTranscription(config: TranscriptionConfig) {
 			console.log(
 				chalk.blueBright(`[info] Fetching remote audio: ${audioFile}`)
 			);
+
+			const exists = await checkUrlExists(audioFile);
+			if (!exists) {
+				console.error(
+					chalk.red(`[error] Remote URL not reachable: ${audioFile}`)
+				);
+				return null;
+			}
 		}
 
 		const transcription = await transcribeAudio(filePath, {
@@ -38,7 +49,7 @@ export async function runTranscription(config: TranscriptionConfig) {
 			return null;
 		}
 	} catch (err: unknown) {
-		if (err instanceof Error && (err as any).code === "ENOENT") {
+		if ((err as NodeJS.ErrnoException).code === "ENOENT") {
 			console.error(chalk.red(`[error] File not found: ${audioFile}`));
 		} else {
 			console.error(
