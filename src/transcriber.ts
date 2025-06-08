@@ -38,7 +38,7 @@ export async function transcribeAudio(
 
 		let buffer: Buffer;
 
-		if (sourceType === "supabase") {
+		if (sourceType === "remote") {
 			const response = await fetch(filePath);
 			if (!response.ok) {
 				console.error(

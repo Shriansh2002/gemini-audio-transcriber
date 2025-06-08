@@ -65,7 +65,7 @@ export async function runTranscription(
 		const transcription: string | null = await transcribeAudio(filePath, {
 			style,
 			language,
-			sourceType: isRemote ? "supabase" : "local",
+			sourceType: isRemote ? "remote" : "local",
 		});
 
 		if (verbose) {
