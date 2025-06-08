@@ -1,3 +1,4 @@
+import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { KnownAudioExtension } from "../types";
 
@@ -40,4 +41,58 @@ export function getMimeType(filePath: string): string {
 		);
 		return "audio/octet-stream";
 	}
+}
+
+export async function getFileBuffer(
+	input: string | Buffer,
+	sourceType: "local" | "remote" | "buffer"
+): Promise<Buffer | null> {
+	try {
+		if (sourceType === "buffer") {
+			return input as Buffer;
+		} else if (sourceType === "remote") {
+			return await getRemoteFileBuffer(input as string);
+		} else {
+			return await getLocalFileBuffer(input as string);
+		}
+	} catch (error) {
+		console.error(
+			`[error] Failed to get file buffer:`,
+			error instanceof Error ? error.message : String(error)
+		);
+		return null;
+	}
+}
+
+async function getRemoteFileBuffer(filePath: string): Promise<Buffer> {
+	const response = await fetch(filePath);
+	if (!response.ok) {
+		throw new Error(`Failed to fetch remote file: ${response.statusText}`);
+	}
+	const arrayBuffer = await response.arrayBuffer();
+	return Buffer.from(arrayBuffer);
+}
+
+async function getLocalFileBuffer(filePath: string): Promise<Buffer> {
+	return await fs.readFile(filePath);
+}
+
+export function createFileFromBuffer(
+	buffer: Buffer,
+	input: string | Buffer,
+	sourceType: "local" | "remote" | "buffer"
+): CustomFile {
+	let mimeType: string;
+	let fileName: string;
+
+	if (sourceType === "buffer") {
+		mimeType = "audio/wav";
+		fileName = "audio_buffer.wav";
+	} else {
+		const filePath = input as string;
+		mimeType = getMimeType(filePath);
+		fileName = path.basename(filePath);
+	}
+
+	return new CustomFile([buffer], fileName, { type: mimeType });
 }
