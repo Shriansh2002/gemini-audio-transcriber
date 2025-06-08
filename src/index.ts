@@ -16,8 +16,7 @@ export async function runTranscription(
 	} = config;
 
 	try {
-		const isRemote =
-			audioFile.startsWith("http://") || audioFile.startsWith("https://");
+		const isRemote = /^https?:\/\//i.test(audioFile);
 
 		let filePath = audioFile;
 
