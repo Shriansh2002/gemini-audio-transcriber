@@ -32,7 +32,6 @@ import type { TranscriptionConfig, RunTranscriptionResult } from "./types";
  *   console.error("Error:", result.error);
  * }
  */
-
 export async function runTranscription(
 	config: TranscriptionConfig
 ): Promise<RunTranscriptionResult> {
@@ -130,5 +129,75 @@ export async function runTranscription(
 			console.error(chalk.red("[error] Unexpected error:"), errorMessage);
 			return { success: false, error: `Unexpected error: ${errorMessage}` };
 		}
+	}
+}
+
+/**
+ * Transcribe audio from a Blob object.
+ *
+ * @param {Blob} audioBlob - The audio Blob to transcribe.
+ * @param {Omit<TranscriptionConfig, "audioFile">} options - Transcription options excluding audioFile.
+ * @param {string} [options.style='conversational'] - Transcription style.
+ * @param {string} [options.language='english'] - Language of the audio.
+ * @param {boolean} [options.verbose=true] - Enable verbose logging.
+ *
+ * @returns {Promise<RunTranscriptionResult>} The transcription result with success status and error or transcription.
+ */
+export async function runTranscriptionWithBlob(
+	audioBlob: Blob,
+	options?: Omit<TranscriptionConfig, "audioFile">
+): Promise<RunTranscriptionResult> {
+	const {
+		style = "conversational",
+		language = "english",
+		verbose = true,
+	} = options ?? {};
+
+	if (!audioBlob || typeof audioBlob.arrayBuffer !== "function") {
+		const errorMsg =
+			"Invalid audioBlob parameter: must be a valid Blob object.";
+		if (verbose) console.error(chalk.red(`[error] ${errorMsg}`));
+		return { success: false, error: errorMsg };
+	}
+
+	try {
+		if (verbose) {
+			console.log(
+				chalk.blueBright("[info] Processing audio Blob for transcription")
+			);
+			console.time("TranscriptionTime");
+		}
+
+		const arrayBuffer = await audioBlob.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
+
+		const transcription = await transcribeAudio(buffer, {
+			style,
+			language,
+			sourceType: "buffer",
+		});
+
+		if (verbose) {
+			console.timeEnd("TranscriptionTime");
+		}
+
+		if (transcription) {
+			if (verbose) {
+				console.log(chalk.greenBright("\n--- Transcription ---\n"));
+				console.log(transcription);
+				console.log(chalk.greenBright("\n--- Done ---\n"));
+			}
+			return { success: true, transcription };
+		} else {
+			const warnMsg = "[warn] No transcription result returned.";
+			if (verbose) console.log(chalk.yellow(warnMsg));
+			return { success: false, error: "No transcription result returned." };
+		}
+	} catch (err: unknown) {
+		const errMsg =
+			err instanceof Error ? err.message : String(err ?? "Unknown error");
+		if (verbose)
+			console.error(chalk.red(`[error] Unexpected error: ${errMsg}`));
+		return { success: false, error: `Unexpected error: ${errMsg}` };
 	}
 }
