@@ -1,6 +1,6 @@
 {
 	"name": "audio-transcripter",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"description": "Lightweight TypeScript library for transcribing audio files using Google Gemini 2.0 models. Supports local files, remote URLs, and Blobs.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
@@ -29,6 +29,7 @@
 		"type": "git",
 		"url": "git+https://github.com/Shriansh2002/gemini-audio-transcriber.git"
 	},
+	"homepage": "https://shriansh2002.github.io/gemini-audio-transcriber-site/",
 	"files": [
 		"dist/"
 	],
